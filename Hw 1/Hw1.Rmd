@@ -1,0 +1,59 @@
+---
+title: "Hw 1 R Code"
+author: "Deanna Springgay"
+date: "1/31/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Libraries
+library(tidyverse)
+library(TSA)
+```
+
+### 1.4
+
+Below are two plots of different simulations of the chi-squared distribution in following code block. Both appear to follow non-normal distributions but they are not random - they follow a chi-squared distribution.
+
+```{r chi-square}
+set.seed(7)
+chiSquare <- ts(rchisq(n = 48, df = 2))
+plot(chiSquare, type = "o", ylab = "", main = "Chi-Squared Distribution, n = 48, df = 2")
+abline(h = 0, lty = 2)
+```
+
+```{r chi-square_1, echo=FALSE}
+set.seed(3)
+chiSquare <- ts(rchisq(n = 48, df = 2))
+plot(chiSquare, type = "o", ylab = "", main = "Chi-Squared Distribution, n = 48, df = 2")
+abline(h = 0, lty = 2)
+```
+
+### 1.5
+
+Below are two plots of different simulations of the t distribution in following code block. Both appear to follow normal and do not appear to be random.
+
+```{r t-dist}
+set.seed(17)
+chiSquare <- ts(rt(n = 48, df = 5))
+plot(chiSquare, type = "o", ylab = "", main = "t Distribution, n = 48, df = 5")
+abline(h = 0, lty = 2)
+```
+
+```{r t-dist_1, echo=FALSE}
+set.seed(90)
+chiSquare <- ts(rt(n = 48, df = 5))
+plot(chiSquare, type = "o", ylab = "", main = "t Distribution, n = 48, df = 5")
+abline(h = 0, lty = 2)
+```
+
+### 1.6
+
+```{r dubuque}
+data("tempdub")
+plot(tempdub, type = "l", ylab = "Average Temperature")
+points(y = tempdub, x = time(tempdub), pch = as.vector(season(tempdub)))
+```
