@@ -1,0 +1,346 @@
+---
+title: "Homework 2"
+author: "Deanna Springgay"
+date: "2/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lattice)
+library(lmtest)
+library(pander)
+library(sandwich)
+library(TSA)
+```
+
+### Problems
+
+*3.2 and 3.3 are attached at the end*
+
+**3.7a)**
+
+From the following plot we can see that the Unit Sales has been following an increasing trend over the time period of 1967 to 1972.
+
+```{r 3.7a, echo=FALSE}
+data("winnebago")
+xyplot(winnebago, ylab = "Unit Sales")
+```
+
+**3.7b)**
+
+Analysis after fitting a linear model indicates that both the intercept and slope of the linear model are significantly significant since the p-values are so small at a scale of e-17. 69% of the variance present in the data is explained by the model.
+
+```{r 3.7b, echo=FALSE}
+winn_fit1 <- lm(winnebago ~ time(winnebago))
+pander(summary(winn_fit1))
+```
+
+The following plot of the residuals shows the range of the residuals increasing as time passes, indicating heteroscedasticity and that this data will need to be transformed before we continue analysis.
+
+```{r residuals, echo=FALSE}
+xyplot(rstudent(winn_fit1) ~ time(winnebago),
+  type = "l",
+  xlab = "Time", ylab = "Studentized Residuals"
+)
+```
+
+
+**3.7c)**
+
+The following plot shows the data after undergoing a log transformation, and it is apparent that the increasing variance has been corrected. The residuals now appear to have a zero mean and constant variance.This model is better, as almost 80% of the variance is explained by the model.
+
+```{r 3.7c, echo=FALSE}
+winn_fit_log <- lm(log(winnebago) ~ time(winnebago))
+pander(summary(winn_fit_log))
+xyplot(rstudent(winn_fit_log) ~ time(winnebago),
+  type = "l",
+  xlab = "Time", ylab = "Studentized Residuals"
+)
+```
+
+**3.7d)**
+
+From the following plot we can see a somewhat oscillating pattern of higher residuals around springtime in comparison to the other months. Overall, the residuals look more like random noise, though it is apparent that we are overestimating values for the springtime.
+
+```{r 3.7d, echo=FALSE}
+xyplot(rstudent(winn_fit_log) ~ time(winnebago),
+  type = "l",
+  xlab = "Time", ylab = "Studentized Residuals",
+  panel = function(x, y, ...) {
+    panel.xyplot(x, y, ...)
+    panel.xyplot(x, y, pch = as.vector(season(winnebago)), col = 1)
+  }
+)
+```
+
+**3.7e)**
+
+This model further explains variance found in the data; it explains 89% of the variance. The following table summarizes the significant seasonal-means and time trends:
+
+|Significant|Not Significant|
+| ----------| -------------|
+|Intercept|October|
+|February|November|
+|March|December|
+|April||
+|May||
+|June||
+|July||
+|August||
+|September||
+|Time||
+
+```{r 3.7e, echo=FALSE}
+winn_fit_seasonal <- lm(log(winnebago) ~ season(winnebago) + time(winnebago))
+pander(summary(winn_fit_seasonal))
+```
+
+The following HAC test indicates that only October and November are not influenced by other values.
+
+```{r 3.7HAC, echo=FALSE}
+coeftest(winn_fit_seasonal, vcov = vcovHAC(winn_fit_seasonal))
+```
+
+
+**3.7f)**
+
+The following residual plot indicates that the residuals follow a zero mean and constant variance.
+
+```{r 3.7f, echo=FALSE}
+xyplot(rstudent(winn_fit_seasonal) ~ time(winnebago),
+  type = "l",
+  xlab = "Time", ylab = "Studentized Residuals",
+  panel = function(x, y, ...) {
+    panel.xyplot(x, y, ...)
+    panel.xyplot(x, y, col = 1, pch = as.vector(season(winnebago)))
+  }
+)
+```
+
+**3.8a)**
+
+From this plot it appears that retail sales in the UK have been rising each year, but with a large peak each year in December, likely due to holiday shopping.
+
+```{r 3.8a, echo=FALSE}
+data(retail)
+xyplot(retail, panel = function(x, y, ...) {
+  panel.xyplot(x, y, ...)
+  panel.xyplot(x, y, pch = as.vector(season(retail)), col = 1)
+})
+```
+
+**3.8b)**
+
+From these residuals we can conclude that every month, intercept, and time are significantly significant except for the month of March. This model also appears to be an effective model; accounting for almost 98% of the variance in the data.
+
+```{r 3.8b, echo=FALSE}
+retail_lm <- lm(retail ~ season(retail) + time(retail))
+pander(summary(retail_lm))
+```
+
+The following HAC test indicates that only March is not influenced by other values.
+
+```{r 3.8HAC, echo=FALSE}
+coeftest(retail_lm, vcov = vcovHAC(retail_lm))
+```
+
+**3.8c)**
+
+While the residuals from this time period seem to average a zero mean and roughly have constant variance, there appears to be somewhat of a pattern when it comes to December: the residuals seem to follow a positive linear trend while the other months stay around zero. This makes me hesitate in claiming constant variance, since the second half of the time period could be described as showing heteroscedasticity.
+
+```{r 3.8c, echo=FALSE}
+xyplot(rstudent(retail_lm) ~ time(retail),
+  type = "l",
+  xlab = "Time", ylab = "Studentized Residuals",
+  panel = function(x, y, ...) {
+    panel.xyplot(x, y, ...)
+    panel.xyplot(x, y, pch = as.vector(season(retail)), col = 1)
+  }
+)
+```
+
+**3.9a)**
+
+From this plot we can see a cyclical seasonal trend with the peak season being summer and there is an increase over the long-term.
+
+```{r 3.9a, echo=FALSE}
+data(prescrip)
+xyplot(prescrip,
+  ylab = "Prescription Costs",
+  panel = function(x, y, ...) {
+    panel.xyplot(x, y, ...)
+    panel.xyplot(x, y, pch = as.vector(season(prescrip)), col = 1)
+  }
+)
+```
+
+**3.9b)**
+
+The plot shows that the monthly percentage change appears to be stationary.
+
+```{r 3.9b, echo=FALSE}
+pchange <- diff(prescrip) / prescrip
+xyplot(pchange ~ time(prescrip),
+  type = "l",
+  xlab = "Time",
+  ylab = "Percent Change",
+  panel = function(x, y, ...) {
+    panel.xyplot(x, y, ...)
+    panel.xyplot(x, y, pch = as.vector(season(pchange)), col = 1)
+  }
+)
+```
+
+**3.9c)**
+
+While the model is statistically significant (all portions of the model have p-values less than 0.05), the model only explains about 31% of the variance present in the data.
+
+```{r 3.9c, echo=FALSE}
+pres_cos <- lm(pchange ~ harmonic(pchange))
+pander(summary(pres_cos))
+```
+
+**3.9d)**
+
+The following residual plot appears to have a zero mean and constant variance, indicating that the coside trend model is adequate.
+
+```{r 3.9d, echo=FALSE}
+xyplot(rstudent(pres_cos) ~ time(prescrip), type = "l", xlab = "Time", ylab = "Studentized Residuals")
+```
+
+**3.13a)**
+
+```{r 3.13a, echo=FALSE}
+winn_resid <- rstudent(winn_fit_seasonal)
+pander(summary(winn_resid))
+pander(winn_resid)
+# does she want to see the residuals??
+```
+
+**3.13b)**
+
+The runs test is significant since we have less runs than expected. We can conclude that the residuals are not random.
+
+```{r 3.13b, echo=FALSE}
+runs(winn_resid)
+```
+
+**3.13c)**
+
+The following ACF plot indicates there is autocorrelation present in the residuals, so we can conclude there is dependency present.
+
+```{r 3.13c, echo=FALSE}
+acf(winn_resid, main = NULL)
+```
+
+**3.13d)**
+
+The Q-Q plot indicates there is a left-skew in the residuals. The density plot shows us an approximately normal distribution among the residuals.
+
+```{r 3.13d, echo=FALSE}
+figa <-
+  qqmath(winn_resid,
+    xlab = "Theoretical Quantities",
+    asp = 1,
+    ylab = "Studentized Residuals",
+    panel = function(x, ...) {
+      panel.qqmathline(x, ...)
+      panel.qqmath(x, ...)
+    }
+  )
+
+figb <- densityplot(winn_resid, xlab = "Studentized Residuals")
+gridExtra::grid.arrange(figa, figb, ncol = 2)
+```
+
+**3.14a)**
+
+```{r 3.14a, echo=FALSE}
+retail_lm_seasonal <- lm(retail ~ time(retail) + season(retail))
+retail_resid <- rstudent(retail_lm_seasonal)
+pander(summary(retail_resid))
+pander(retail_resid)
+# does she want to see the residuals??
+```
+
+**3.14b)**
+
+The runs test is significant since we have less runs than expected. We can conclude that the residuals are not random.
+
+```{r 3.14b, echo=FALSE}
+runs(retail_resid)
+```
+
+**3.14c)**
+
+The following ACF plot indicates there is autocorrelation present in the residuals, so we can conclude there is dependency present.
+
+```{r 3.14c, echo=FALSE}
+acf(retail_resid, main = NULL)
+```
+
+**3.14d)**
+
+The distribution of the residuals in both the Q-Q plot and the density plot is quite light-tailed.
+
+```{r 3.14d, echo=FALSE}
+figa <-
+  qqmath(retail_resid,
+    xlab = "Theoretical Quantities",
+    asp = 1,
+    ylab = "Studentized Residuals",
+    panel = function(x, ...) {
+      panel.qqmathline(x, ...)
+      panel.qqmath(x, ...)
+    }
+  )
+
+figb <- densityplot(retail_resid, xlab = "Studentized Residuals")
+gridExtra::grid.arrange(figa, figb, ncol = 2)
+```
+
+**3.15a)**
+
+```{r 3.15a, echo=FALSE}
+pres_resid <- rstudent(pres_cos)
+pander(summary(pres_cos))
+pander(pres_cos)
+# does she want to see the residuals??
+```
+
+**3.15b)**
+
+The runs test is significant since we have less runs than expected. We can conclude that the residuals are not random.
+
+```{r 3.15b, echo=FALSE}
+runs(pres_resid)
+```
+
+**3.15c)**
+
+The following ACF plot indicates there are a small number of lags that have statistically significant correlation, which indicates there may be a trend that has not been taken into account. This does not appear to indicate dependency.
+
+```{r 3.15c, echo=FALSE}
+acf(pres_resid, main = NULL)
+```
+
+**3.15d)**
+
+The distribution of the residuals in both the Q-Q plot and the density plot indicates a heavy-tailed and right-skewed distribution.
+
+```{r 3.15d, echo=FALSE}
+figa <-
+  qqmath(pres_resid,
+    xlab = "Theoretical Quantities",
+    asp = 1,
+    ylab = "Studentized Residuals",
+    panel = function(x, ...) {
+      panel.qqmathline(x, ...)
+      panel.qqmath(x, ...)
+    }
+  )
+
+figb <- densityplot(pres_resid, xlab = "Studentized Residuals")
+gridExtra::grid.arrange(figa, figb, ncol = 2)
+```
