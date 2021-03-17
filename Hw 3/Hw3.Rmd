@@ -1,0 +1,153 @@
+---
+title: "Homework 3"
+author: "Deanna Springgay"
+date: "3/16/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problems
+
+Written questions are attached at the end
+
+### 4.2
+**a)**
+```{r 4.2a, echo=FALSE}
+y <- ARMAacf(ma = c(0.5, 0.4), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+```
+
+**b)**
+```{r 4.2b, echo=FALSE}
+y <- ARMAacf(ma = c(1.2, -0.7), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+```
+
+**c)**
+```{r 4.2c, echo=FALSE}
+y <- ARMAacf(ma = c(-1, -0.6), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+```
+
+### 4.5
+**a)**
+```{r 4.5a, echo=FALSE}
+y <- ARMAacf(ar = 0.6, lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+```
+
+**b)**
+```{r 4.5b, echo=FALSE}
+y <- ARMAacf(ar = -0.6, lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+```
+
+**c)**
+```{r 4.5c, echo=FALSE}
+y <- ARMAacf(ar = 0.95, lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+```
+
+**d)**
+```{r 4.5d, echo=FALSE}
+y <- ARMAacf(ar = 0.3, lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+```
+
+### 4.9
+**a)** 0.6 + 0.3 = 0.9 < 1, 0.3 - 0.6 = -0.3 < 1, |0.3| < 1
+
+Therefore, this process is stationary and causal. The roots of the characteristic equation are real.
+```{r 4.9a, echo=FALSE}
+y <- ARMAacf(ar = c(0.6, 0.3), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+
+polyroot(c(1, -0.6, -0.3))
+```
+
+**b)** -0.4 + 0.5 = 0.1 < 1, 0.5 - -0.4 = 0.9 < 1, |0.5| < 1
+
+Therefore, this process is stationary and causal. The roots of the characteristic equation are real.
+```{r 4.9b, echo=FALSE}
+y <- ARMAacf(ar = c(-0.4, 0.5), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+
+polyroot(c(1, 0.4, -0.5))
+```
+
+**c)** 1.2 + -0.7 = 0.5 < 1, -0.7 - 1.2 = -1.9 < 1, |-0.7| < 1
+
+Therefore, this process is stationary and causal. The roots of the characteristic equation are complex.
+```{r 4.9c, echo=FALSE}
+y <- ARMAacf(ar = c(1.2, -0.7), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+
+polyroot(c(1, -1.2, 0.7))
+```
+
+**d)** -1 + -0.6 = -1.6 < 1, -0.6 - -1 = 0.4 < 1, |-0.6| < 1
+
+Therefore, this process is stationary and causal. The roots of the characteristic equation are complex.
+```{r 4.9d, echo=FALSE}
+y <- ARMAacf(ar = c(-1, -0.6), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+
+polyroot(c(1, 1, 0.6))
+```
+
+**e)** 0.5 + -0.9 = -0.4 < 1, -0.9 - 0.5 = -1.4 < 1, |-0.9| < 1
+
+Therefore, this process is stationary and causal. The roots of the characteristic equation are complex.
+```{r 4.9e, echo=FALSE}
+y <- ARMAacf(ar = c(0.5, -0.9), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+
+polyroot(c(1, -0.5, 0.9))
+```
+
+**f)** -0.5 + -0.6 = -1.1 < 1, -0.6 - -0.5 = -0.1 < 1, |-0.6| < 1
+
+Therefore, this process is stationary and causal. The roots of the characteristic equation are complex.
+```{r 4.9f, echo=FALSE}
+y <- ARMAacf(ar = c(-0.5, -0.6), lag.max = 20)
+plot(y, x = 0:20, type = "h", ylim = c(-1, 1), xlab = "k", ylab = "Autocorrelation")
+abline(h = 0)
+
+polyroot(c(1, 0.5, 0.6))
+```
+
+### 4.19
+This is similar to an AR(1) with pk = -(-0.5)^k
+```{r 4.19a}
+ARMAacf(ar=-0.5, lag.max=7)
+```
+```{r 4.19b}
+ARMAacf(ma = -c(0.5, -0.25, 0.125, -0.0625, 0.03125, -0.0015625))
+```
+
+### 4.20
+This is similar to an ARMA(1,1) with phi = -0.5 and theta = 0.5
+```{r 4.20a}
+ARMAacf(ar = -0.5, ma = -0.5, lag.max = 8)
+```
+```{r 4.20b}
+ARMAacf(ma = -c(1, -0.5, 0.25, -0.125, 0.0625, -0.03125, 0.015625))
+```
+
