@@ -1,0 +1,40 @@
+---
+title: "Homework 4"
+author: "Deanna Springgay"
+date: "4/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problems
+
+Written questions are attached at the end
+
+### 5.1
+
+
+### 5.12
+
+
+### 6.12
+
+
+### 6.13
+
+
+### 6.19
+
+
+### 6.26
+
+
+### 6.27
+
+
+### 6.31
+
+
+### 6.36
