@@ -2,39 +2,135 @@
 title: "Homework 4"
 author: "Deanna Springgay"
 date: "4/2/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(forecast)
+library(TSA)
+library(tseries)
 ```
 
 ### Problems
 
 Written questions are attached at the end
 
-### 5.1
-
-
 ### 5.12
 
+a) This time series shows a positive trend that levels off around 1970.
+```{r 5.12a, echo=FALSE}
+data(SP)
+plot(SP,type='o')
+```
 
-### 6.12
+b) There isn't as much variation as the last plot, but the positive trend is still present.
+```{r 5.12b, echo=FALSE}
+plot(log(SP),type='o')
+```
 
+c) Here the correlation is very strong at 99.6% between the fractional changes and the differences of logarithms.
+```{r 5.12c, echo=FALSE}
+percentage=na.omit((SP-zlag(SP))/zlag(SP))
+plot(x=diff(log(SP))[-1],y=percentage[-1])
+cor(diff(log(SP))[-1],percentage[-1])
+```
 
-### 6.13
-
-
-### 6.19
-
+d) From the following information, we can conclude the data is nonstationary.
+```{r 5.12d1, echo=FALSE}
+acf(SP)
+adf.test(SP)
+pp.test(SP)
+```
 
 ### 6.26
 
+a) p1 = -(0.5)/(1+0.5^2) = -0.4 is the only nonzero autocorrelation.
+
+b) ACF at lag 1 is fine, and there aren't any particularly strong correlations present.
+```{r 6.26b, echo=FALSE}
+set.seed(4687)
+series1=arima.sim(n=48,list(ma=-0.5))
+acf(series1)
+```
+
+c) The correlations seem to disappear around lag 10 to lag 15.
+```{r 6.26c, echo=FALSE}
+theta=0.5; phi=rep(NA,20)
+for (k in 1:20) {phi[k]=-(theta^k)*(1-theta^2)/(1-theta^(2*(k+1)))}
+plot(phi,type='h'); abline(h=0)
+```
+
+d) The first 2 lags match well, but the other lags are negligible.
+```{r 6.26d, echo=FALSE}
+pacf(series1)
+```
 
 ### 6.27
 
+a)
+```{r 6.27a, echo=FALSE}
+series2=arima.sim(n=72,list(ar=c(0.7,-0.4)))
+phi1=0.7; phi2=-0.4; ACF=ARMAacf(ar=c(phi1,phi2),lag.max=20)
+plot(y=ACF[-1],x=1:20,type='h',ylim=c(-0.6,0.6)); abline(h=0)
+```
+
+b) Lag 1 matches well along with a wave pattern starting, but the pattern isn't dying out like expected from the theoretical ACF.
+```{r 6.27b, echo=FALSE}
+acf(series2)
+```
+
+c) phi11 = 0.5, phi22 = 0.7, and phi = 0 otherwise
+
+e) The sample PACF doesn't match with the thoreticals as much as expected.
+```{r 6.27e, echo=FALSE}
+pacf(series2)
+```
 
 ### 6.31
 
+a) The Dickey-Fuller test leads us to reject nonstationarity.
+```{r 6.31a, echo=FALSE}
+series3=arima.sim(n=60,list(order=c(0,1,1),ma=-0.8))
+adf.test(series3, k=0)
+```
+
+b) R chose k=4, and running this in the Dickey-Fuller test leads us to fail to reject nonstationarity.
+```{r 6.31 b, echo=FALSE}
+ar(diff(series3))
+adf.test(series3, k=4)
+```
+
+c) At k=0, the DF test rejects nonstationarity. R chose r=6, and running the DF test again at k=6 we still reject nonstationarity though not to the same degree.
+```{r 6.31c, echo=FALSE}
+adf.test(diff(series3), k=0)
+ar(diff(diff(series3)))
+adf.test(diff(series3), k=6)
+```
 
 ### 6.36
+
+a) The data appears to be stationary, but we can also try a nonstationary model in case there is drift.
+```{r 6.36a, echo=FALSE}
+data(robot); plot(robot,type='o')
+```
+
+b) Neither of these plots are particularly helpful due to potential noise.
+```{r 6.36b, echo=FALSE}
+acf(robot);pacf(robot)
+```
+
+c) EACF indicates an ARIMA(1, 0, 1) model.
+```{r 6.36c, echo=FALSE}
+eacf(robot)
+```
+
+d) After checking a couple models, I would say this data would best be modeled by an ARIMA(1, 0, 1) model based off the output from the EACF since it had the lowest AIC, AICc, and BIC out of the 4 models I tested.
+```{r 6.36d, echo=FALSE}
+Arima(robot,method="ML",c(0,0,1))
+Arima(robot,method="ML",c(1,0,0))
+Arima(robot,method="ML",c(1,0,1))
+auto.arima(robot)
+```
