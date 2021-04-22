@@ -2,7 +2,9 @@
 title: "Homework 5"
 author: "Deanna Springgay"
 date: "4/22/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -20,6 +22,7 @@ Written questions are attached at the end
 ### 8.6
 
 a) The residuals seem to be random around a zero mean.
+
 ```{r 8.6a, echo=FALSE}
 series1=arima.sim(n=48,list(ar=c(1.5,-0.75)))
 model1=arima(series1,order=c(2,0,0))
@@ -27,17 +30,20 @@ plot(rstandard(model1), type='o'); abline(h=0)
 ```
 
 b) The residuals seem to follow a normal distribution.
+
 ```{r 8.6b, echo=FALSE}
 qqnorm(rstandard(model1))
 qqline(rstandard(model1))
 ```
 
 c) None of the lags are significant.
+
 ```{r 8.6c, echo=FALSE}
 acf(rstandard(model1))
 ```
 
 d) From the Ljung-Box test we fail to reject the null hypothesis of independent residuals.
+
 ```{r 8.6d, echo=FALSE}
 LB.test(model1,lag=12)
 ```
@@ -45,6 +51,7 @@ LB.test(model1,lag=12)
 ### 8.9
 
 While both models are significant, the arima(0,1,1) model has a better log likelihood and AIC.
+
 ```{r 8.9a, echo=FALSE}
 data(robot)
 model2=arima(robot,order=c(1,0,0))
@@ -56,18 +63,21 @@ model3
 ```
 
 The arima(1,0,0) model might have some drift, but arima(0,1,1) doesn't seem to have any problems at this point.
+
 ```{r 8.9b, echo=FALSE}
 plot(residual2,ylab='arima(1,0,0)'); abline(h=0)
 plot(residual3,ylab='arima(0,1,1)'); abline(h=0)
 ```
 
 The arima(1,0,0) model has a lag problem with many lags being significant. The arima(0,1,1) model doesn't have any significant lags except for lag100 and the Ljung-Box test gives a good result of failing to reject the null hypothesis of not showing lack of fit. We will only move forward with the arima(0,1,1) model from this point on.
+
 ```{r 8.9c, echo=FALSE}
 acf(residuals(model2), main='arima(1,0,0)',ylab='ACF'); LB.test(model2)
 acf(residuals(model3), main='arima(0,1,1)',ylab='ACF'); LB.test(model3)
 ```
 
 From the following outputs, we can conclude that the arima(0,1,1) model fits well - normality is good, the residuals are also good, and the p-values are acceptable.
+
 ```{r 8.9d, echo=FALSE}
 qqnorm(residuals(model3)); qqline(residuals(model3))
 shapiro.test(residuals(model3))
@@ -77,6 +87,7 @@ tsdiag(model3)
 ### 9.16
 
 a)
+
 ```{r 9.6a, echo=FALSE}
 series2=(arima.sim(n=45,list(order=c(0,2,2),ma=c(-1,0.75)))[-1])[-1]
 actual=window(series2,start=41); series2=window(series2,end=40)
@@ -84,41 +95,48 @@ model4=arima(series2,order=c(0,2,2)); model4
 ```
 
 b) The forcasts are linear when the rest of the plot isn't.
+
 ```{r 9.6b, echo=FALSE}
 result=plot(model4,n.ahead=5,col=NULL)
 ```
 
 c) The forecast appears to be underestimating the actual values.
+
 ```{r 9.6c, echo=FALSE}
 forecast=result$pred; cbind(actual,forecast)
 ```
 
 d) The actual values fall within the 95% CI except the point at 42 which appears to be on the CI boundary. From the actual values, time 42 is just below the upper CI bound.
+
 ```{r 9.6d, echo=FALSE}
 plot(model4,n1=38,n.ahead=5)
 points(x=seq(41,45),y=actual)
 lower=result$lpi; upper=result$upi; cbind(lower,actual,upper)
 ```
 
-e)
+e) At this different seed, the forecast is overestimating the actual values.
+
 ```{r 9.6e, echo=FALSE}
-# series3=(arima.sim(n=45,list(order=c(1,1,2),ma=c(-1,0.75)))[-1])[-1]
-# actual2=window(series3,start=41); series3=window(series3,end=40)
-# model5=arima(series3,order=c(1,1,2)); model5
-# 
-# result2=plot(model5,n.ahead=5,col=NULL)
-# 
-# forecast2=result2$pred; cbind(actual2,forecast)
-# 
-# plot(model5,n1=38,n.ahead=5)
-# points(x=seq(41,45),y=actual2)
-# lower2=result2$lpi; upper2=result2$upi; cbind(lower2,actual2,upper2)
+set.seed(7)
+series3=(arima.sim(n=45,list(order=c(0,2,2),ma=c(-1,0.75)))[-1])[-1]
+actual2=window(series3,start=41); series3=window(series3,end=40)
+model5=arima(series3,order=c(0,2,2)); model5
+
+result2=plot(model5,n.ahead=5,col=NULL)
+
+forecast2=result2$pred; cbind(actual2,forecast)
+
+plot(model5,n1=38,n.ahead=5)
+points(x=seq(41,45),y=actual2)
+lower2=result2$lpi; upper2=result2$upi; cbind(lower2,actual2,upper2)
 ```
 
 ### 9.23
 
 a)
+
 ```{r 9.23a, echo=FALSE}
+set.seed(64584)
 data(robot)
 model6=arima(robot,order=c(0,1,1))
 result3=plot(model6,n.ahead=5,col=NULL)
@@ -129,11 +147,13 @@ cbind(lower,predicted,upper)
 ```
 
 b) The forcasts are basically constant and the CI is very wide, likely due to the variance seen in previous values.
+
 ```{r 9.23b, echo=FALSE}
 plot(model6,n1=300,n.ahead=5)
 ```
 
 c) Both of these models produce very similar forecasts.
+
 ```{r 9.23c, echo=FALSE}
 model7=arima(robot,order=c(1,0,1))
 result4=plot(model7,n.ahead=5,col=NULL)
